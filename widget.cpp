@@ -1,6 +1,10 @@
 #include "widget.h"
 #include "ui_widget.h"
 #include <QMessageBox>
+#include <QString>
+
+const int COIN_LIST[] = {500,100,50,10};
+
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget)
@@ -20,6 +24,7 @@ void Widget::changeMoney(int coin)
 {
     money += coin;
     setControl();
+    ui->lcdNumber->display(money);
 }
 
 void Widget::setControl()
@@ -29,68 +34,69 @@ void Widget::setControl()
     ui->pbMilk->setEnabled(money>=100);
 }
 
+int Widget::getChange(int coin)
+{
+    int change = money / coin;
+    money %=coin;
+    return change;
+}
+
 
 
 void Widget::on_pbCoin500_clicked()
 {
     changeMoney(500);
-    ui->lcdNumber->display(money);
-
 }
 
 void Widget::on_pbCoin100_clicked()
 {
     changeMoney(100);
-    ui->lcdNumber->display(money);
-
 
 }
 
 void Widget::on_pbCoin50_clicked()
 {
     changeMoney(50);
-    ui->lcdNumber->display(money);
+
 }
 
 void Widget::on_pbCoin10_clicked()
 {
     changeMoney(10);
-    ui->lcdNumber->display(money);
+
 }
 
 
 void Widget::on_pbCoffee_clicked()
 {
     changeMoney(-200);
-    ui->lcdNumber->display(money);
 }
 
 void Widget::on_pbTea_clicked()
 {
     changeMoney(-150);
-    ui->lcdNumber->display(money);
 }
 
 void Widget::on_pbMilk_clicked()
 {
     changeMoney(-100);
-    ui->lcdNumber->display(money);
 }
 
 void Widget::on_pbReset_clicked()
 {
     QMessageBox msgBox;
-    int change500 = money / 500;
-    money = money % 500;
-    int change100 = money / 100;
-    money = money % 100;
-    int change50 = money / 50;
-    money = money % 50;
-    int change10 = money / 10;
-    money = money % 10;
-    char str[128];
-    sprintf(str,"Coin Change is \n500: %d, 100: %d, 50: %d, 10: %d",change500,change100,change50,change10);
-    msgBox.setText(str);
-    msgBox.exec();
-    ui->lcdNumber->display(money);
+    QString msg = "Coin Change\n";
+    int coinListNum = sizeof(COIN_LIST) / sizeof(int);
+    for(int i=0; i<coinListNum; i++){
+        int coinNum = getChange(COIN_LIST[i]);
+        if(coinNum > 0){
+            QString strCoinType = QString::number(COIN_LIST[i]);
+            QString strCoinNum = QString::number(coinNum);
+            msg += strCoinType + ":" + strCoinNum + "\n";
+        }
+    }
+    changeMoney(0);
+    msgBox.information(this,"coin reset",msg);
+
+
 }

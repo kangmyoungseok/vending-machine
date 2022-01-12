@@ -17,6 +17,7 @@ public:
     int money=0;
     void changeMoney(int coin);
     void setControl();
+    int getChange(int coin);
 
 private slots:
     void on_pbCoin500_clicked();
